@@ -16,6 +16,36 @@
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body { margin: 0; }
+  /* Las fotos se cargan vía el atributo src de <image-slot>; ocultamos el
+     borde punteado del placeholder que queda al re-renderizar la plantilla. */
+  image-slot::part(ring) { display: none !important; }
+
+  /* Entrada escalonada de las tarjetas de café. Estado inicial oculto; la
+     clase .ea-cafes-in en <html> (puesta al ver la sección o apretar el CTA)
+     lanza la animación con un retardo creciente por tarjeta. */
+  #cafes .ea-cafe-card { opacity: 0; transform: translateY(34px) scale(.97); }
+  html.ea-cafes-in #cafes .ea-cafe-card { animation: ea-card-in .62s cubic-bezier(.2,.7,.2,1) both; }
+  html.ea-cafes-in #cafes .ea-cafe-card:nth-child(1)  { animation-delay: 0s; }
+  html.ea-cafes-in #cafes .ea-cafe-card:nth-child(2)  { animation-delay: .07s; }
+  html.ea-cafes-in #cafes .ea-cafe-card:nth-child(3)  { animation-delay: .14s; }
+  html.ea-cafes-in #cafes .ea-cafe-card:nth-child(4)  { animation-delay: .21s; }
+  html.ea-cafes-in #cafes .ea-cafe-card:nth-child(5)  { animation-delay: .28s; }
+  html.ea-cafes-in #cafes .ea-cafe-card:nth-child(6)  { animation-delay: .35s; }
+  html.ea-cafes-in #cafes .ea-cafe-card:nth-child(7)  { animation-delay: .42s; }
+  html.ea-cafes-in #cafes .ea-cafe-card:nth-child(8)  { animation-delay: .49s; }
+  html.ea-cafes-in #cafes .ea-cafe-card:nth-child(9)  { animation-delay: .56s; }
+  html.ea-cafes-in #cafes .ea-cafe-card:nth-child(10) { animation-delay: .63s; }
+  html.ea-cafes-in #cafes .ea-cafe-card:nth-child(11) { animation-delay: .70s; }
+  html.ea-cafes-in #cafes .ea-cafe-card:nth-child(12) { animation-delay: .77s; }
+  /* Estado final congelado: un re-render posterior no reinicia la entrada. */
+  html.ea-cafes-done #cafes .ea-cafe-card { opacity: 1; transform: none; animation: none; }
+  @keyframes ea-card-in {
+    from { opacity: 0; transform: translateY(34px) scale(.97); }
+    to   { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #cafes .ea-cafe-card { opacity: 1 !important; transform: none !important; animation: none !important; }
+  }
   :root {
     --bg:#F5EFE6; --surface:#FFFFFF; --surface-2:#F8F8F8;
     --ink:#4E342E; --ink-soft:#6D4C41; --muted:rgba(78,52,46,.62);
@@ -47,6 +77,18 @@
   @media (prefers-reduced-motion: reduce){ *{ animation:none !important; } html{ scroll-behavior:auto; } }
   @media (max-width: 880px){ [data-desktop-nav]{ display:none !important; } [data-burger]{ display:grid !important; } }
   @media (max-width: 760px){ [data-cols2]{ grid-template-columns:1fr !important; gap:36px !important; } [data-cols3]{ grid-template-columns:1fr !important; gap:36px !important; } }
+  /* --- Responsive: menos aire vertical y tarjetas más compactas en móvil/tablet --- */
+  @media (max-width: 760px){
+    [data-reveal]{ padding-top:78px !important; padding-bottom:78px !important; }
+    #inicio{ padding-top:104px !important; padding-bottom:64px !important; }
+    .ea-card-lg{ padding:40px 26px !important; }
+  }
+  @media (max-width: 480px){
+    [data-reveal]{ padding-top:58px !important; padding-bottom:58px !important; }
+    #inicio{ padding-top:96px !important; padding-bottom:56px !important; min-height:100svh; }
+    .ea-card-lg{ padding:32px 20px !important; }
+    #cafes [style*="minmax(250px"], #equipos [style*="minmax(240px"]{ gap:18px !important; }
+  }
 </style>
 </helmet>
 <div id="ea-root" data-theme="{{ theme }}" style="background:var(--bg);color:var(--ink);font-family:Montserrat,system-ui,sans-serif;min-height:100vh;overflow-x:hidden;transition:background .4s ease,color .4s ease;position:relative">
@@ -103,7 +145,7 @@
     </div>
   </sc-if>
 
-  <header id="inicio" style="position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;overflow:hidden">
+  <header id="inicio" style="position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;overflow:hidden;background:linear-gradient(to bottom, transparent 72%, var(--bg) 100%),radial-gradient(72% 62% at 50% 42%, color-mix(in srgb, var(--bg) 90%, transparent), color-mix(in srgb, var(--bg) 72%, transparent) 60%, color-mix(in srgb, var(--bg) 50%, transparent) 100%),url('https://images.pexels.com/photos/35982640/pexels-photo-35982640.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat">
     <div style="position:absolute;inset:0;background:radial-gradient(60% 55% at 50% 30%, color-mix(in srgb, var(--brand) 8%, transparent), transparent 70%),radial-gradient(50% 40% at 80% 85%, color-mix(in srgb, var(--brand-2) 10%, transparent), transparent 70%);opacity:var(--hero-tex);pointer-events:none"></div>
     <div style="position:absolute;inset:0;background-image:radial-gradient(color-mix(in srgb,var(--ink) 22%,transparent) 1px, transparent 1.4px);background-size:26px 26px;opacity:calc(var(--hero-tex) * .05);pointer-events:none"></div>
     <div style="position:relative;width:min(58vw,240px);aspect-ratio:1;margin-bottom:8px;animation:ea-float 7s ease-in-out infinite">
@@ -115,7 +157,7 @@
     <p style="margin:14px 0 0;font-family:Poppins,sans-serif;font-weight:300;letter-spacing:.42em;font-size:clamp(14px,2.4vw,22px);color:var(--brand-2);animation:ea-rise 1s cubic-bezier(.2,.7,.2,1) .12s both">CAFETERÍA &amp; MÁS</p>
     <p style="margin:30px 0 0;max-width:520px;font-size:clamp(16px,2vw,20px);font-style:italic;color:var(--muted);animation:ea-rise 1s ease .28s both">"El sabor del café que une momentos."</p>
     <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:38px;animation:ea-rise 1s ease .42s both">
-      <a href="#cafes" style="display:inline-flex;align-items:center;gap:10px;padding:16px 32px;border-radius:999px;background:var(--btn-bg);color:var(--btn-ink);font-family:Poppins,sans-serif;font-weight:600;font-size:16px;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s" style-hover="transform:translateY(-4px);box-shadow:var(--shadow-strong)">
+      <a id="ea-cta-cafes" href="#cafes" style="display:inline-flex;align-items:center;gap:10px;padding:16px 32px;border-radius:999px;background:var(--btn-bg);color:var(--btn-ink);font-family:Poppins,sans-serif;font-weight:600;font-size:16px;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s" style-hover="transform:translateY(-4px);box-shadow:var(--shadow-strong)">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z"/><path d="M6 1v3M10 1v3M14 1v3"/></svg>
         Ver nuestro café
       </a>
@@ -142,7 +184,7 @@
       </div>
     </div>
     <div style="position:relative;aspect-ratio:4/5;border-radius:26px;overflow:hidden;box-shadow:var(--shadow-strong)">
-      <image-slot id="ea-historia" shape="rect" fit="cover" placeholder="Foto del local / baristas"></image-slot>
+      <image-slot id="ea-historia" src="assets/historia.jpg" shape="rect" fit="cover" placeholder="Foto del local / baristas"></image-slot>
     </div>
   </section>
 
@@ -155,9 +197,9 @@
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:26px">
         <sc-for list="{{ coffees }}" as="c" hint-placeholder-count="8">
-          <div style="background:var(--surface);border-radius:22px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;transition:transform .32s,box-shadow .32s" style-hover="transform:translateY(-8px);box-shadow:var(--shadow-strong)">
+          <div class="ea-cafe-card" style="background:var(--surface);border-radius:22px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;transition:transform .32s,box-shadow .32s" style-hover="transform:translateY(-8px);box-shadow:var(--shadow-strong)">
             <div style="position:relative;aspect-ratio:4/3;background:var(--surface-2)">
-              <image-slot id="{{ c.slot }}" shape="rect" fit="cover" placeholder="{{ c.name }}"></image-slot>
+              <image-slot id="{{ c.slot }}" src="{{ c.img }}" shape="rect" fit="cover" placeholder="{{ c.name }}"></image-slot>
               <span style="position:absolute;top:12px;left:12px;padding:6px 12px;border-radius:999px;background:var(--nav-bg);backdrop-filter:blur(6px);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-2)">{{ c.tag }}</span>
             </div>
             <div style="padding:20px;display:flex;flex-direction:column;flex:1">
@@ -198,7 +240,7 @@
         <sc-for list="{{ products }}" as="p" hint-placeholder-count="8">
           <div style="background:var(--surface);border-radius:20px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;transition:transform .3s,box-shadow .3s" style-hover="transform:translateY(-6px);box-shadow:var(--shadow-strong)">
             <div style="position:relative;aspect-ratio:1;background:var(--surface-2)">
-              <image-slot id="{{ p.slot }}" shape="rect" fit="cover" placeholder="{{ p.name }}"></image-slot>
+              <image-slot id="{{ p.slot }}" src="{{ p.img }}" shape="rect" fit="cover" placeholder="{{ p.name }}"></image-slot>
               <span style="position:absolute;top:12px;left:12px;padding:5px 11px;border-radius:999px;background:var(--nav-bg);backdrop-filter:blur(6px);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-2)">{{ p.catLabel }}</span>
             </div>
             <div style="padding:18px;display:flex;flex-direction:column;flex:1">
@@ -219,7 +261,7 @@
   </section>
 
   <section id="horarios" data-reveal style="background:var(--surface-2);padding:110px 24px;transition:background .4s">
-    <div style="max-width:640px;margin:0 auto;background:var(--surface);border-radius:26px;box-shadow:var(--shadow-strong);border:1px solid var(--line);padding:52px 44px;text-align:center">
+    <div class="ea-card-lg" style="max-width:640px;margin:0 auto;background:var(--surface);border-radius:26px;box-shadow:var(--shadow-strong);border:1px solid var(--line);padding:52px 44px;text-align:center">
       <span style="display:grid;place-items:center;width:70px;height:70px;margin:0 auto 22px;border-radius:50%;background:color-mix(in srgb,var(--brand) 12%,transparent);color:var(--brand)">
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
       </span>
@@ -452,34 +494,34 @@ class Component extends DCLogic {
   fmt(n){ return "₲ " + n.toLocaleString("es-PY"); }
 
   get COFFEES(){ return [
-    { id:"espresso", name:"Espresso", tag:"Clásico", price:12000, slot:"cf-espresso", desc:"Shot intenso y aromático, corazón de todo buen café." },
-    { id:"americano", name:"Americano", tag:"Suave", price:15000, slot:"cf-americano", desc:"Espresso alargado con agua caliente, equilibrado y ligero." },
-    { id:"capuccino", name:"Capuccino", tag:"Cremoso", price:22000, slot:"cf-capuccino", desc:"Espresso, leche vaporizada y una nube de espuma sedosa." },
-    { id:"latte", name:"Latte", tag:"Suave", price:24000, slot:"cf-latte", desc:"Mucha leche cremosa sobre un espresso delicado." },
-    { id:"mocaccino", name:"Mocaccino", tag:"Dulce", price:26000, slot:"cf-mocaccino", desc:"Café, chocolate y leche: el abrazo perfecto." },
-    { id:"flatwhite", name:"Flat White", tag:"Intenso", price:23000, slot:"cf-flatwhite", desc:"Doble ristretto con microespuma aterciopelada." },
-    { id:"macchiato", name:"Macchiato", tag:"Clásico", price:18000, slot:"cf-macchiato", desc:"Espresso 'manchado' con un toque de espuma." },
-    { id:"chocolate", name:"Chocolate Caliente", tag:"Dulce", price:25000, slot:"cf-chocolate", desc:"Chocolate fundido y leche, para consentirte." },
-    { id:"te", name:"Té", tag:"Sin café", price:14000, slot:"cf-te", desc:"Selección de infusiones y tés de hoja entera." },
-    { id:"frappe", name:"Frappé", tag:"Frío", price:28000, slot:"cf-frappe", desc:"Café helado batido, cremoso y refrescante." },
-    { id:"coldbrew", name:"Cold Brew", tag:"Frío", price:27000, slot:"cf-coldbrew", desc:"Extracción en frío por 18 horas, suave y dulce." },
-    { id:"especialidad", name:"Café de Especialidad", tag:"Premium", price:32000, slot:"cf-especialidad", desc:"Grano de origen único, tostado y servido con arte." },
+    { id:"espresso", name:"Espresso", tag:"Clásico", price:12000, slot:"cf-espresso", desc:"Shot intenso y aromático, corazón de todo buen café.", img:"https://images.pexels.com/photos/18604200/pexels-photo-18604200.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"americano", name:"Americano", tag:"Suave", price:15000, slot:"cf-americano", desc:"Espresso alargado con agua caliente, equilibrado y ligero.", img:"https://images.pexels.com/photos/12039010/pexels-photo-12039010.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"capuccino", name:"Capuccino", tag:"Cremoso", price:22000, slot:"cf-capuccino", desc:"Espresso, leche vaporizada y una nube de espuma sedosa.", img:"https://images.pexels.com/photos/997670/pexels-photo-997670.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"latte", name:"Latte", tag:"Suave", price:24000, slot:"cf-latte", desc:"Mucha leche cremosa sobre un espresso delicado.", img:"https://images.pexels.com/photos/459489/pexels-photo-459489.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"mocaccino", name:"Mocaccino", tag:"Dulce", price:26000, slot:"cf-mocaccino", desc:"Café, chocolate y leche: el abrazo perfecto.", img:"https://images.pexels.com/photos/8058120/pexels-photo-8058120.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"flatwhite", name:"Flat White", tag:"Intenso", price:23000, slot:"cf-flatwhite", desc:"Doble ristretto con microespuma aterciopelada.", img:"https://images.pexels.com/photos/32938771/pexels-photo-32938771.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"macchiato", name:"Macchiato", tag:"Clásico", price:18000, slot:"cf-macchiato", desc:"Espresso 'manchado' con un toque de espuma.", img:"https://images.pexels.com/photos/11160148/pexels-photo-11160148.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"chocolate", name:"Chocolate Caliente", tag:"Dulce", price:25000, slot:"cf-chocolate", desc:"Chocolate fundido y leche, para consentirte.", img:"https://images.pexels.com/photos/16607248/pexels-photo-16607248.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"te", name:"Té", tag:"Sin café", price:14000, slot:"cf-te", desc:"Selección de infusiones y tés de hoja entera.", img:"https://images.pexels.com/photos/6448532/pexels-photo-6448532.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"frappe", name:"Frappé", tag:"Frío", price:28000, slot:"cf-frappe", desc:"Café helado batido, cremoso y refrescante.", img:"https://images.pexels.com/photos/12166771/pexels-photo-12166771.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"coldbrew", name:"Cold Brew", tag:"Frío", price:27000, slot:"cf-coldbrew", desc:"Extracción en frío por 18 horas, suave y dulce.", img:"https://images.pexels.com/photos/1078773/pexels-photo-1078773.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"especialidad", name:"Café de Especialidad", tag:"Premium", price:32000, slot:"cf-especialidad", desc:"Grano de origen único, tostado y servido con arte.", img:"https://images.pexels.com/photos/19873648/pexels-photo-19873648.jpeg?auto=compress&cs=tinysrgb&w=900" },
   ]; }
 
   get PRODUCTS(){ return [
-    { id:"p-italiana", name:"Cafetera Italiana", cat:"cafeteras", price:180000, slot:"pr-italiana", desc:"Moka clásica para un espresso casero con carácter." },
-    { id:"p-francesa", name:"Cafetera Francesa", cat:"cafeteras", price:210000, slot:"pr-francesa", desc:"Prensa de émbolo para un cuerpo redondo y aromático." },
-    { id:"p-goteo", name:"Cafetera de Goteo", cat:"cafeteras", price:250000, slot:"pr-goteo", desc:"Preparación automática por goteo, ideal para la familia." },
-    { id:"p-espresso", name:"Cafetera Espresso", cat:"cafeteras", price:1450000, slot:"pr-espresso", desc:"Bomba de 15 bares para espresso de nivel barista." },
-    { id:"p-automatica", name:"Cafetera Automática", cat:"cafeteras", price:2900000, slot:"pr-automatica", desc:"Del grano a la taza con solo un botón." },
-    { id:"p-molinillo", name:"Molinillo", cat:"accesorios", price:320000, slot:"pr-molinillo", desc:"Molienda uniforme para liberar todo el aroma." },
-    { id:"p-tazas", name:"Set de Tazas", cat:"accesorios", price:95000, slot:"pr-tazas", desc:"Tazas de cerámica que conservan el calor." },
-    { id:"p-termo", name:"Termo", cat:"accesorios", price:140000, slot:"pr-termo", desc:"Lleva tu café caliente a donde vayas." },
-    { id:"p-filtros", name:"Filtros", cat:"accesorios", price:35000, slot:"pr-filtros", desc:"Filtros de papel para una taza limpia y clara." },
-    { id:"p-prensa", name:"Prensa Francesa", cat:"accesorios", price:210000, slot:"pr-prensa", desc:"Émbolo de acero inoxidable, resistente y elegante." },
-    { id:"p-jarra", name:"Jarra para Leche", cat:"accesorios", price:85000, slot:"pr-jarra", desc:"Pitcher de acero para texturizar y hacer latte art." },
-    { id:"p-tamper", name:"Tamper", cat:"accesorios", price:120000, slot:"pr-tamper", desc:"Prensa el café con presión pareja y precisa." },
-    { id:"p-balanza", name:"Balanza para Café", cat:"accesorios", price:180000, slot:"pr-balanza", desc:"Precisión al gramo para recetas perfectas." },
+    { id:"p-italiana", name:"Cafetera Italiana", cat:"cafeteras", price:180000, slot:"pr-italiana", desc:"Moka clásica para un espresso casero con carácter.", img:"https://images.pexels.com/photos/28613082/pexels-photo-28613082.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"p-francesa", name:"Cafetera Francesa", cat:"cafeteras", price:210000, slot:"pr-francesa", desc:"Prensa de émbolo para un cuerpo redondo y aromático.", img:"https://images.pexels.com/photos/34566502/pexels-photo-34566502.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"p-goteo", name:"Cafetera de Goteo", cat:"cafeteras", price:250000, slot:"pr-goteo", desc:"Preparación automática por goteo, ideal para la familia.", img:"https://images.pexels.com/photos/8937271/pexels-photo-8937271.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"p-espresso", name:"Cafetera Espresso", cat:"cafeteras", price:1450000, slot:"pr-espresso", desc:"Bomba de 15 bares para espresso de nivel barista.", img:"https://images.pexels.com/photos/6032797/pexels-photo-6032797.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"p-automatica", name:"Cafetera Automática", cat:"cafeteras", price:2900000, slot:"pr-automatica", desc:"Del grano a la taza con solo un botón.", img:"https://images.pexels.com/photos/2566027/pexels-photo-2566027.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"p-molinillo", name:"Molinillo", cat:"accesorios", price:320000, slot:"pr-molinillo", desc:"Molienda uniforme para liberar todo el aroma.", img:"https://images.pexels.com/photos/2972365/pexels-photo-2972365.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"p-tazas", name:"Set de Tazas", cat:"accesorios", price:95000, slot:"pr-tazas", desc:"Tazas de cerámica que conservan el calor.", img:"https://images.pexels.com/photos/6312194/pexels-photo-6312194.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"p-termo", name:"Termo", cat:"accesorios", price:140000, slot:"pr-termo", desc:"Lleva tu café caliente a donde vayas.", img:"https://images.pexels.com/photos/7734743/pexels-photo-7734743.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"p-filtros", name:"Filtros", cat:"accesorios", price:35000, slot:"pr-filtros", desc:"Filtros de papel para una taza limpia y clara.", img:"https://images.pexels.com/photos/34566499/pexels-photo-34566499.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"p-prensa", name:"Prensa Francesa", cat:"accesorios", price:210000, slot:"pr-prensa", desc:"Émbolo de acero inoxidable, resistente y elegante.", img:"https://images.pexels.com/photos/13935593/pexels-photo-13935593.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"p-jarra", name:"Jarra para Leche", cat:"accesorios", price:85000, slot:"pr-jarra", desc:"Pitcher de acero para texturizar y hacer latte art.", img:"https://images.pexels.com/photos/13882006/pexels-photo-13882006.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"p-tamper", name:"Tamper", cat:"accesorios", price:120000, slot:"pr-tamper", desc:"Prensa el café con presión pareja y precisa.", img:"https://images.pexels.com/photos/4349794/pexels-photo-4349794.jpeg?auto=compress&cs=tinysrgb&w=900" },
+    { id:"p-balanza", name:"Balanza para Café", cat:"accesorios", price:180000, slot:"pr-balanza", desc:"Precisión al gramo para recetas perfectas.", img:"https://images.pexels.com/photos/34492952/pexels-photo-34492952.jpeg?auto=compress&cs=tinysrgb&w=900" },
   ]; }
 
   get theme(){ return this.state.theme ?? (this.props.themeDefault ?? "light"); }
@@ -508,6 +550,39 @@ class Component extends DCLogic {
       }, { threshold:.12 });
       els.forEach(el => io.observe(el));
     }
+    // Entrada escalonada de las tarjetas de café. Se maneja por CSS con una
+    // clase en <html> (nodo que el framework nunca reconcilia) para que
+    // sobreviva a los re-render del sc-for que regenera las tarjetas. Se
+    // dispara al llegar a la sección o al apretar "Ver nuestro café".
+    const root = document.documentElement;
+    this._cafesPlayed = false;
+    const playCafes = () => {
+      if (this._cafesPlayed || reduce) return;
+      this._cafesPlayed = true;
+      root.classList.add("ea-cafes-in");
+      // Congela el estado final tras la animación para que un re-render
+      // posterior (p. ej. agregar al carrito) no reinicie la entrada.
+      setTimeout(() => { root.classList.add("ea-cafes-done"); }, 12 * 75 + 700);
+    };
+    if (!reduce && "IntersectionObserver" in window){
+      const cio = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting){ playCafes(); cio.disconnect(); } });
+      }, { threshold:.15 });
+      const sec = document.getElementById("cafes");
+      if (sec) cio.observe(sec);
+    }
+    // Botón CTA: dejamos que el ancla haga su scroll nativo suave a #cafes
+    // (scroll-behavior:smooth) y solo agregamos el "pulse" del botón y el
+    // disparo de la animación escalonada de las tarjetas.
+    const cta = document.getElementById("ea-cta-cafes");
+    if (cta){
+      this._onCtaCafes = () => {
+        cta.style.transform = "scale(.94)";
+        setTimeout(() => { cta.style.transform = ""; }, 170);
+        playCafes();
+      };
+      cta.addEventListener("click", this._onCtaCafes);
+    }
     // nav shadow + back-to-top (DOM only, no re-render)
     this._onScroll = () => {
       const y = window.scrollY;
@@ -521,7 +596,7 @@ class Component extends DCLogic {
     this._onKey = (e) => { if (e.key==="Escape") this.setState({ cartOpen:false, menuOpen:false }); };
     window.addEventListener("keydown", this._onKey);
   }
-  componentWillUnmount(){ window.removeEventListener("scroll", this._onScroll); window.removeEventListener("keydown", this._onKey); }
+  componentWillUnmount(){ window.removeEventListener("scroll", this._onScroll); window.removeEventListener("keydown", this._onKey); const cta = document.getElementById("ea-cta-cafes"); if (cta && this._onCtaCafes) cta.removeEventListener("click", this._onCtaCafes); }
 
   renderVals(){
     const dark = this.theme === "dark";
