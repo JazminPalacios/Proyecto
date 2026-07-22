@@ -147,6 +147,28 @@ a:hover { color: var(--ink); }
 @media (max-width: 760px){ .ea-hero-banner{ padding: 88px 20px 72px; } #cafes-hero{ padding-top: 108px; } }
 @media (max-width: 480px){ .ea-hero-banner{ padding: 80px 16px 60px; } #cafes-hero{ padding-top: 96px; } }
 
+/* Animación de barrido (destello) sobre las imágenes destacadas: una banda
+   de luz diagonal cruza la imagen en bucle. El retardo por tarjeta se controla
+   con la variable --sweep-delay para lograr un barrido escalonado en la fila. */
+.ea-sweep{ position: relative; overflow: hidden; }
+.ea-sweep::after{
+  content: "";
+  position: absolute; top: 0; bottom: 0; left: -160%;
+  width: 80%;
+  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,.30) 45%, rgba(255,255,255,.45) 50%, rgba(255,255,255,.30) 55%, transparent 100%);
+  transform: skewX(-18deg);
+  pointer-events: none;
+  z-index: 1;
+  animation: ea-sweep 3.6s cubic-bezier(.4,0,.2,1) infinite;
+  animation-delay: var(--sweep-delay, 0s);
+}
+@keyframes ea-sweep{
+  0%   { left: -160%; }
+  55%  { left: 160%; }
+  100% { left: 160%; }
+}
+@media (prefers-reduced-motion: reduce){ .ea-sweep::after{ display: none; } }
+
 /* Barra de búsqueda/filtros que se superpone ligeramente al banner. */
 .ea-hero-search{
   max-width: 1240px;

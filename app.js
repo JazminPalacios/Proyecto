@@ -138,7 +138,7 @@ window.EA = {
         // contiene (#destacados). Ajusta cuántas imágenes se ven según el ancho
         // (4 / 2 / 1) y rota una página cada 4 s. Se maneja por estado para
         // sobrevivir a los re-render del framework.
-        if (document.getElementById("destacados")) {
+        if (document.getElementById("destacados") || document.getElementById("cafes-destacados")) {
           const computePerView = () => { const w = window.innerWidth; return w >= 880 ? 4 : w >= 560 ? 2 : 1; };
           const applyPerView = () => {
             const pv = computePerView();
@@ -213,6 +213,14 @@ window.EA = {
         const featPrev = () => this.setState(s => ({ featSlide: (s.featSlide - 1 + this.featPages(s.featPerView)) % this.featPages(s.featPerView) }));
         const featNext = () => this.setState(s => ({ featSlide: (s.featSlide + 1) % this.featPages(s.featPerView) }));
 
+        // Cafés destacados (página de cafés): mismo carrusel, con id de slot
+        // propio (feat-*) para no colisionar con la grilla, y un retardo de
+        // barrido escalonado por posición dentro del grupo de 4.
+        const coffeesFeatured = this.COFFEES.slice(0, this.FEAT_COUNT).map((c, i) => ({
+          ...c, slot: "feat-" + c.slot, priceLabel: this.fmt(c.price), add: () => this.add(c),
+          itemStyle: "flex:0 0 " + featBasis + "%;max-width:" + featBasis + "%;padding:0 12px;--sweep-delay:" + ((i % 4) * 0.3) + "s",
+        }));
+
         const faqData = [
           { q:"¿Puedo pedir para llevar?", a:"¡Claro! Todas nuestras bebidas están disponibles para llevar y también para delivery a través de WhatsApp." },
           { q:"¿Ofrecen opciones sin lácteos?", a:"Sí, contamos con leche de almendras, avena y soja para casi todas nuestras preparaciones." },
@@ -257,7 +265,7 @@ window.EA = {
           coffeeCats, coffeeQuery: this.state.coffeeQuery,
           setCoffeeSearch: (e) => this.setState({ coffeeQuery: e.target.value }),
           coffeeNoResults: coffees.length===0,
-          featured, featTrackStyle, featDots, featPrev, featNext,
+          featured, coffeesFeatured, featTrackStyle, featDots, featPrev, featNext,
           hours: [
             { day:"Lunes a Viernes", time:"07:00 – 21:00" },
             { day:"Sábados", time:"08:00 – 22:00" },
