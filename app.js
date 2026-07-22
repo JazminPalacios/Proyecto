@@ -23,7 +23,11 @@ window.EA = {
     const sec = (hash) => (PAGE === "home" ? hash : "index.html" + hash);
 
     return class Component extends DCLogic {
-      state = { theme: null, menuOpen: false, cartOpen: false, cart: [], query: "", cat: "all", coffeeQuery: "", coffeeTag: "all", openFaq: 0, cToast: false, nToast: false };
+      state = { theme: null, menuOpen: false, cartOpen: false, cart: [], query: "", cat: "all", coffeeQuery: "", coffeeTag: "all", featSlide: 0, featPerView: 4, openFaq: 0, cToast: false, nToast: false };
+
+      // Cantidad de equipos destacados en el carrusel de inicio (múltiplo de 4).
+      get FEAT_COUNT(){ return Math.min(12, this.PRODUCTS.length); }
+      featPages(perView){ return Math.max(1, Math.ceil(this.FEAT_COUNT / (perView || this.state.featPerView))); }
 
       fmt(n){ return "₲ " + n.toLocaleString("es-PY"); }
 
@@ -129,8 +133,31 @@ window.EA = {
         this._onScroll();
         this._onKey = (e) => { if (e.key==="Escape") this.setState({ cartOpen:false, menuOpen:false }); };
         window.addEventListener("keydown", this._onKey);
+
+        // Carrusel de equipos destacados: solo se activa en la página que lo
+        // contiene (#destacados). Ajusta cuántas imágenes se ven según el ancho
+        // (4 / 2 / 1) y rota una página cada 4 s. Se maneja por estado para
+        // sobrevivir a los re-render del framework.
+        if (document.getElementById("destacados")) {
+          const computePerView = () => { const w = window.innerWidth; return w >= 880 ? 4 : w >= 560 ? 2 : 1; };
+          const applyPerView = () => {
+            const pv = computePerView();
+            if (pv !== this.state.featPerView) {
+              this.setState(s => ({ featPerView: pv, featSlide: Math.min(s.featSlide, this.featPages(pv) - 1) }));
+            }
+          };
+          applyPerView();
+          this._onFeatResize = applyPerView;
+          window.addEventListener("resize", this._onFeatResize, { passive:true });
+          if (!reduce) {
+            this._featTimer = setInterval(() => {
+              if (document.hidden) return; // no rotar en pestañas en segundo plano
+              this.setState(s => ({ featSlide: (s.featSlide + 1) % this.featPages(s.featPerView) }));
+            }, 4000);
+          }
+        }
       }
-      componentWillUnmount(){ window.removeEventListener("scroll", this._onScroll); window.removeEventListener("keydown", this._onKey); const cta = document.getElementById("ea-cta-cafes"); if (cta && this._onCtaCafes) cta.removeEventListener("click", this._onCtaCafes); }
+      componentWillUnmount(){ window.removeEventListener("scroll", this._onScroll); window.removeEventListener("keydown", this._onKey); window.removeEventListener("resize", this._onFeatResize); if (this._featTimer) clearInterval(this._featTimer); const cta = document.getElementById("ea-cta-cafes"); if (cta && this._onCtaCafes) cta.removeEventListener("click", this._onCtaCafes); }
 
       renderVals(){
         const dark = this.theme === "dark";
@@ -167,6 +194,24 @@ window.EA = {
           style: catBtn(this.state.coffeeTag === t),
           onClick: () => this.setState({ coffeeTag: t }),
         }));
+
+        // Carrusel de equipos destacados (inicio): muestra los productos de a
+        // "páginas" de 4 imágenes y rota automáticamente cada 4 s.
+        const featPerView = this.state.featPerView;
+        const featPages = this.featPages(featPerView);
+        const featSlide = Math.min(this.state.featSlide, featPages - 1);
+        const featBasis = (100 / featPerView);
+        const featured = this.PRODUCTS.slice(0, this.FEAT_COUNT).map(p => ({
+          ...p, priceLabel: this.fmt(p.price), catLabel: catLabels[p.cat], add: () => this.add(p),
+          itemStyle: "flex:0 0 " + featBasis + "%;max-width:" + featBasis + "%;padding:0 12px",
+        }));
+        const featTrackStyle = "display:flex;transform:translateX(-" + (featSlide * 100) + "%);transition:transform .6s cubic-bezier(.2,.7,.2,1)";
+        const featDots = Array.from({ length: featPages }, (_, i) => ({
+          onClick: () => this.setState({ featSlide: i }),
+          style: "height:9px;border:none;cursor:pointer;transition:all .3s;border-radius:999px;padding:0;width:" + (i === featSlide ? "26px" : "9px") + ";background:" + (i === featSlide ? "var(--brand-2)" : "var(--line-2)"),
+        }));
+        const featPrev = () => this.setState(s => ({ featSlide: (s.featSlide - 1 + this.featPages(s.featPerView)) % this.featPages(s.featPerView) }));
+        const featNext = () => this.setState(s => ({ featSlide: (s.featSlide + 1) % this.featPages(s.featPerView) }));
 
         const faqData = [
           { q:"¿Puedo pedir para llevar?", a:"¡Claro! Todas nuestras bebidas están disponibles para llevar y también para delivery a través de WhatsApp." },
@@ -212,6 +257,7 @@ window.EA = {
           coffeeCats, coffeeQuery: this.state.coffeeQuery,
           setCoffeeSearch: (e) => this.setState({ coffeeQuery: e.target.value }),
           coffeeNoResults: coffees.length===0,
+          featured, featTrackStyle, featDots, featPrev, featNext,
           hours: [
             { day:"Lunes a Viernes", time:"07:00 – 21:00" },
             { day:"Sábados", time:"08:00 – 22:00" },
