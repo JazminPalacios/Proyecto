@@ -1,0 +1,12 @@
+# Dependencias y builds del panel de administración
+admin/node_modules
+admin/dist
+
+# Variables de entorno (contienen claves)
+admin/.env
+admin/.env.*
+!admin/.env.example
+
+# Sistema
+.DS_Store
+Thumbs.db
