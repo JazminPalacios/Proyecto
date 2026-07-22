@@ -115,19 +115,24 @@ a:hover { color: var(--ink); }
   .ea-card-lg{ padding:32px 20px !important; }
   #cafes [style*="minmax(250px"], #equipos [style*="minmax(240px"]{ gap:18px !important; }
 }
-/* Cabecera de la página independiente de Cafés: banner con imagen de fondo
-   y superposición cálida para que el texto crema se lea bien en claro/oscuro. */
-#cafes-hero{
+/* Banner de cabecera reutilizable (Nuestros Cafés y Equipos e Insumos):
+   imagen de fondo con superposición cálida y textura, para que el texto
+   crema se lea bien en tema claro y oscuro. La foto se define por id. */
+.ea-hero-banner{
   position: relative;
-  padding: 132px 24px 94px;
+  padding: 104px 24px 92px;
   text-align: center;
   overflow: hidden;
-  background:
-    linear-gradient(to bottom, rgba(28,19,15,.60), rgba(28,19,15,.76)),
-    url('https://images.pexels.com/photos/35982640/pexels-photo-35982640.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
-/* Grano/textura sutil sobre la foto, igual que el hero de inicio. */
-#cafes-hero::after{
+.ea-hero-banner::before{  /* superposición cálida sobre la foto */
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(28,19,15,.60), rgba(28,19,15,.76));
+}
+.ea-hero-banner::after{  /* textura de puntos, igual que el hero de inicio */
   content: "";
   position: absolute; inset: 0;
   background-image: radial-gradient(rgba(245,239,230,.10) 1px, transparent 1.4px);
@@ -135,16 +140,19 @@ a:hover { color: var(--ink); }
   opacity: .5;
   pointer-events: none;
 }
-#cafes-hero > *{ position: relative; z-index: 1; }
-@media (max-width: 760px){ #cafes-hero{ padding: 108px 20px 74px; } }
-@media (max-width: 480px){ #cafes-hero{ padding: 96px 16px 62px; } }
+.ea-hero-banner > *{ position: relative; z-index: 1; }
+/* Foto de cada banner. #cafes-hero lleva más aire arriba por ir bajo el nav. */
+#cafes-hero{ padding-top: 132px; background-image: url('https://images.pexels.com/photos/35982640/pexels-photo-35982640.jpeg?auto=compress&cs=tinysrgb&w=1600'); }
+#equipos-hero{ background-image: url('https://images.pexels.com/photos/6032797/pexels-photo-6032797.jpeg?auto=compress&cs=tinysrgb&w=1600'); }
+@media (max-width: 760px){ .ea-hero-banner{ padding: 88px 20px 72px; } #cafes-hero{ padding-top: 108px; } }
+@media (max-width: 480px){ .ea-hero-banner{ padding: 80px 16px 60px; } #cafes-hero{ padding-top: 96px; } }
 
-/* Barra de búsqueda de cafés: se superpone ligeramente al banner. */
-.ea-cafe-search{
+/* Barra de búsqueda/filtros que se superpone ligeramente al banner. */
+.ea-hero-search{
   max-width: 1240px;
   margin: -34px auto 44px;
   padding: 0 24px;
   position: relative;
   z-index: 2;
 }
-@media (max-width: 480px){ .ea-cafe-search{ margin-top: -24px; } }
+@media (max-width: 480px){ .ea-hero-search{ margin-top: -24px; } }
