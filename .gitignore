@@ -1,6 +1,13 @@
 # Dependencias y builds del panel de administración
 admin/node_modules
 admin/dist
+node_modules
+
+# Carpeta de salida que arma scripts/build.mjs (la publica Vercel)
+dist
+
+# Vercel
+.vercel
 
 # Variables de entorno (contienen claves)
 admin/.env
