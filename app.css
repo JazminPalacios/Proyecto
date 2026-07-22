@@ -1,0 +1,82 @@
+/* Estilos compartidos de "Entre Amigos" — usados por index.html y cafes.html
+   para evitar duplicar código. Se enlaza desde <helmet> en cada página. */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; }
+/* Las fotos se cargan vía el atributo src de <image-slot>; ocultamos el
+   borde punteado del placeholder que queda al re-renderizar la plantilla. */
+image-slot::part(ring) { display: none !important; }
+
+/* Entrada escalonada de las tarjetas de café. Estado inicial oculto; la
+   clase .ea-cafes-in en <html> (puesta al ver la sección o apretar el CTA)
+   lanza la animación con un retardo creciente por tarjeta. */
+#cafes .ea-cafe-card { opacity: 0; transform: translateY(34px) scale(.97); }
+html.ea-cafes-in #cafes .ea-cafe-card { animation: ea-card-in .62s cubic-bezier(.2,.7,.2,1) both; }
+html.ea-cafes-in #cafes .ea-cafe-card:nth-child(1)  { animation-delay: 0s; }
+html.ea-cafes-in #cafes .ea-cafe-card:nth-child(2)  { animation-delay: .07s; }
+html.ea-cafes-in #cafes .ea-cafe-card:nth-child(3)  { animation-delay: .14s; }
+html.ea-cafes-in #cafes .ea-cafe-card:nth-child(4)  { animation-delay: .21s; }
+html.ea-cafes-in #cafes .ea-cafe-card:nth-child(5)  { animation-delay: .28s; }
+html.ea-cafes-in #cafes .ea-cafe-card:nth-child(6)  { animation-delay: .35s; }
+html.ea-cafes-in #cafes .ea-cafe-card:nth-child(7)  { animation-delay: .42s; }
+html.ea-cafes-in #cafes .ea-cafe-card:nth-child(8)  { animation-delay: .49s; }
+html.ea-cafes-in #cafes .ea-cafe-card:nth-child(9)  { animation-delay: .56s; }
+html.ea-cafes-in #cafes .ea-cafe-card:nth-child(10) { animation-delay: .63s; }
+html.ea-cafes-in #cafes .ea-cafe-card:nth-child(11) { animation-delay: .70s; }
+html.ea-cafes-in #cafes .ea-cafe-card:nth-child(12) { animation-delay: .77s; }
+/* Estado final congelado: un re-render posterior no reinicia la entrada. */
+html.ea-cafes-done #cafes .ea-cafe-card { opacity: 1; transform: none; animation: none; }
+@keyframes ea-card-in {
+  from { opacity: 0; transform: translateY(34px) scale(.97); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #cafes .ea-cafe-card { opacity: 1 !important; transform: none !important; animation: none !important; }
+}
+:root {
+  --bg:#F5EFE6; --surface:#FFFFFF; --surface-2:#F8F8F8;
+  --ink:#4E342E; --ink-soft:#6D4C41; --muted:rgba(78,52,46,.62);
+  --line:rgba(78,52,46,.12); --line-2:rgba(78,52,46,.22);
+  --brand:#4E342E; --brand-2:#6D4C41;
+  --btn-bg:#4E342E; --btn-ink:#F5EFE6;
+  --nav-bg:rgba(245,239,230,.80); --footer-bg:#3B2A22; --footer-ink:#F5EFE6;
+  --shadow:0 14px 44px rgba(78,52,46,.10); --shadow-strong:0 22px 60px rgba(78,52,46,.20);
+  --logo-dark-op:1; --logo-cream-op:0;
+  --hero-tex:1;
+}
+[data-theme="dark"] {
+  --bg:#241a15; --surface:#2f231d; --surface-2:#382a23;
+  --ink:#F5EFE6; --ink-soft:#e8dccc; --muted:rgba(245,239,230,.62);
+  --line:rgba(245,239,230,.12); --line-2:rgba(245,239,230,.22);
+  --brand:#c9a37a; --brand-2:#d8b98f;
+  --btn-bg:#c9a37a; --btn-ink:#241a15;
+  --nav-bg:rgba(36,26,21,.82); --footer-bg:#1c130f; --footer-ink:#F5EFE6;
+  --shadow:0 14px 44px rgba(0,0,0,.45); --shadow-strong:0 22px 60px rgba(0,0,0,.55);
+  --logo-dark-op:0; --logo-cream-op:1;
+}
+a { color: var(--brand-2); text-decoration: none; }
+a:hover { color: var(--ink); }
+@keyframes ea-float { 0%,100%{ transform: translateY(0) rotate(0deg); } 50%{ transform: translateY(-14px) rotate(1.2deg); } }
+@keyframes ea-breathe { 0%,100%{ transform: scale(1); opacity:.9; } 50%{ transform: scale(1.06); opacity:1; } }
+@keyframes ea-rise { from{ opacity:0; transform: translateY(34px); } to{ opacity:1; transform: translateY(0); } }
+@keyframes ea-glow { 0%,100%{ box-shadow:0 0 0 rgba(201,163,122,0); } 50%{ box-shadow:0 0 60px rgba(120,80,55,.18); } }
+@keyframes ea-steam { 0%{ opacity:0; transform: translateY(6px) scaleY(.8);} 30%{opacity:.7;} 100%{ opacity:0; transform: translateY(-16px) scaleY(1.2);} }
+@media (prefers-reduced-motion: reduce){ *{ animation:none !important; } html{ scroll-behavior:auto; } }
+@media (max-width: 880px){ [data-desktop-nav]{ display:none !important; } [data-burger]{ display:grid !important; } }
+@media (max-width: 760px){ [data-cols2]{ grid-template-columns:1fr !important; gap:36px !important; } [data-cols3]{ grid-template-columns:1fr !important; gap:36px !important; } }
+/* --- Responsive: menos aire vertical y tarjetas más compactas en móvil/tablet --- */
+@media (max-width: 760px){
+  [data-reveal]{ padding-top:78px !important; padding-bottom:78px !important; }
+  #inicio{ padding-top:104px !important; padding-bottom:64px !important; }
+  .ea-card-lg{ padding:40px 26px !important; }
+}
+@media (max-width: 480px){
+  [data-reveal]{ padding-top:58px !important; padding-bottom:58px !important; }
+  #inicio{ padding-top:96px !important; padding-bottom:56px !important; min-height:100svh; }
+  .ea-card-lg{ padding:32px 20px !important; }
+  #cafes [style*="minmax(250px"], #equipos [style*="minmax(240px"]{ gap:18px !important; }
+}
+/* Cabecera de la página independiente de Cafés (misma estética que el hero). */
+#cafes-hero{ padding:150px 24px 40px; text-align:center; }
+@media (max-width: 760px){ #cafes-hero{ padding-top:120px !important; } }
+@media (max-width: 480px){ #cafes-hero{ padding-top:104px !important; } }
