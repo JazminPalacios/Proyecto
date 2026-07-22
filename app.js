@@ -201,7 +201,7 @@ window.EA = {
           menuOpen: this.state.menuOpen,
           navLinks: [
             { label:"Inicio", href: sec("#inicio") }, { label:"Nosotros", href: sec("#nosotros") },
-            { label:"Nuestros Cafés", href:"cafes.html" }, { label:"Equipos", href: sec("#equipos") },
+            { label:"Nuestros Cafés", href:"cafes.html" }, { label:"Equipos", href:"equipos.html" },
             { label:"Horarios", href: sec("#horarios") }, { label:"Ubicación", href: sec("#ubicacion") },
             { label:"Contacto", href: sec("#contacto") },
           ],
