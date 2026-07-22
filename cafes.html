@@ -61,7 +61,7 @@
 
   <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed;inset:0;z-index:60;background:rgba(28,19,15,.5)" onClick="{{ closeMenu }}">
-      <div style="position:absolute;top:0;right:0;width:min(82vw,320px);height:100%;background:var(--surface);box-shadow:var(--shadow-strong);padding:26px;display:flex;flex-direction:column;gap:6px" onClick="{{ stop }}">
+      <div data-mobile-nav style="position:absolute;top:0;right:0;width:min(82vw,320px);height:100%;background:var(--surface);box-shadow:var(--shadow-strong);padding:26px;display:flex;flex-direction:column;gap:6px" onClick="{{ stop }}">
         <button onClick="{{ closeMenu }}" aria-label="Cerrar" style="align-self:flex-end;width:40px;height:40px;border-radius:999px;border:1px solid var(--line-2);background:transparent;color:var(--ink);display:grid;place-items:center;cursor:pointer;margin-bottom:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
         <sc-for list="{{ navLinks }}" as="lnk" hint-placeholder-count="7">
           <a href="{{ lnk.href }}" onClick="{{ closeMenu }}" style="padding:13px 8px;font-family:Poppins,sans-serif;font-size:17px;font-weight:500;color:var(--ink);border-bottom:1px solid var(--line)">{{ lnk.label }}</a>

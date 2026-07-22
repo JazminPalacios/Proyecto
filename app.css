@@ -56,6 +56,45 @@ html.ea-cafes-done #cafes .ea-cafe-card { opacity: 1; transform: none; animation
 }
 a { color: var(--brand-2); text-decoration: none; }
 a:hover { color: var(--ink); }
+
+/* --- Navegación: efecto llamativo al pasar el cursor por las opciones --- */
+[data-desktop-nav] a{
+  position: relative;
+  display: inline-block;
+  padding: 4px 2px;
+  transition: transform .28s cubic-bezier(.2,.7,.2,1), color .28s ease;
+}
+/* Subrayado animado con gradiente de marca: crece de izquierda a derecha. */
+[data-desktop-nav] a::after{
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -5px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .32s cubic-bezier(.2,.7,.2,1);
+}
+[data-desktop-nav] a:hover{
+  color: var(--brand-2) !important;
+  transform: translateY(-3px);
+}
+[data-desktop-nav] a:hover::after{
+  transform: scaleX(1);
+}
+/* Rebote sutil al entrar el cursor, para dar sensación de "vida". */
+@keyframes ea-nav-pop { 0%{ transform: translateY(0); } 55%{ transform: translateY(-5px); } 100%{ transform: translateY(-3px); } }
+[data-desktop-nav] a:hover{ animation: ea-nav-pop .32s cubic-bezier(.2,.7,.2,1); }
+
+/* Enlaces del menú móvil: mismo lenguaje visual al tocar/hover. */
+[data-mobile-nav] a{ transition: transform .25s cubic-bezier(.2,.7,.2,1), color .25s ease, padding-left .25s ease; }
+[data-mobile-nav] a:hover{ color: var(--brand-2) !important; transform: translateX(4px); padding-left: 14px !important; }
+
+@media (prefers-reduced-motion: reduce){
+  [data-desktop-nav] a:hover{ animation: none; transform: none; }
+  [data-desktop-nav] a, [data-mobile-nav] a{ transition: color .2s ease; }
+}
 @keyframes ea-float { 0%,100%{ transform: translateY(0) rotate(0deg); } 50%{ transform: translateY(-14px) rotate(1.2deg); } }
 @keyframes ea-breathe { 0%,100%{ transform: scale(1); opacity:.9; } 50%{ transform: scale(1.06); opacity:1; } }
 @keyframes ea-rise { from{ opacity:0; transform: translateY(34px); } to{ opacity:1; transform: translateY(0); } }
