@@ -23,7 +23,7 @@ window.EA = {
     const sec = (hash) => (PAGE === "home" ? hash : "index.html" + hash);
 
     return class Component extends DCLogic {
-      state = { theme: null, menuOpen: false, cartOpen: false, cart: [], query: "", cat: "all", openFaq: 0, cToast: false, nToast: false };
+      state = { theme: null, menuOpen: false, cartOpen: false, cart: [], query: "", cat: "all", coffeeQuery: "", coffeeTag: "all", openFaq: 0, cToast: false, nToast: false };
 
       fmt(n){ return "₲ " + n.toLocaleString("es-PY"); }
 
@@ -141,7 +141,12 @@ window.EA = {
         const totalNum = this.state.cart.reduce((a,x) => a + x.price*x.qty, 0);
         const cartCount = this.state.cart.reduce((a,x) => a + x.qty, 0);
 
-        const coffees = this.COFFEES.map(c => ({ ...c, priceLabel: this.fmt(c.price), add: () => this.add(c) }));
+        // Buscador + filtro por tipo para la página de cafés.
+        const cq = this.state.coffeeQuery.trim().toLowerCase();
+        const coffees = this.COFFEES
+          .filter(c => this.state.coffeeTag === "all" || c.tag === this.state.coffeeTag)
+          .filter(c => !cq || c.name.toLowerCase().includes(cq) || c.desc.toLowerCase().includes(cq))
+          .map(c => ({ ...c, priceLabel: this.fmt(c.price), add: () => this.add(c) }));
 
         const q = this.state.query.trim().toLowerCase();
         const catLabels = { cafeteras:"Cafeteras", accesorios:"Accesorios" };
@@ -154,6 +159,14 @@ window.EA = {
         const cats = [
           { key:"all", label:"Todos" }, { key:"cafeteras", label:"Cafeteras" }, { key:"accesorios", label:"Accesorios" },
         ].map(c => ({ ...c, style: catBtn(this.state.cat===c.key), onClick: () => this.setState({ cat:c.key }) }));
+
+        // Chips de filtro por tipo de café (Todos + tags únicos: Clásico, Suave, ...).
+        const coffeeTagList = ["all", ...new Set(this.COFFEES.map(c => c.tag))];
+        const coffeeCats = coffeeTagList.map(t => ({
+          key: t, label: t === "all" ? "Todos" : t,
+          style: catBtn(this.state.coffeeTag === t),
+          onClick: () => this.setState({ coffeeTag: t }),
+        }));
 
         const faqData = [
           { q:"¿Puedo pedir para llevar?", a:"¡Claro! Todas nuestras bebidas están disponibles para llevar y también para delivery a través de WhatsApp." },
@@ -196,6 +209,9 @@ window.EA = {
           coffees, cats, products, noResults: products.length===0,
           query: this.state.query,
           setSearch: (e) => this.setState({ query: e.target.value }),
+          coffeeCats, coffeeQuery: this.state.coffeeQuery,
+          setCoffeeSearch: (e) => this.setState({ coffeeQuery: e.target.value }),
+          coffeeNoResults: coffees.length===0,
           hours: [
             { day:"Lunes a Viernes", time:"07:00 – 21:00" },
             { day:"Sábados", time:"08:00 – 22:00" },

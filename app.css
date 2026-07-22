@@ -115,7 +115,36 @@ a:hover { color: var(--ink); }
   .ea-card-lg{ padding:32px 20px !important; }
   #cafes [style*="minmax(250px"], #equipos [style*="minmax(240px"]{ gap:18px !important; }
 }
-/* Cabecera de la página independiente de Cafés (misma estética que el hero). */
-#cafes-hero{ padding:150px 24px 40px; text-align:center; }
-@media (max-width: 760px){ #cafes-hero{ padding-top:120px !important; } }
-@media (max-width: 480px){ #cafes-hero{ padding-top:104px !important; } }
+/* Cabecera de la página independiente de Cafés: banner con imagen de fondo
+   y superposición cálida para que el texto crema se lea bien en claro/oscuro. */
+#cafes-hero{
+  position: relative;
+  padding: 132px 24px 94px;
+  text-align: center;
+  overflow: hidden;
+  background:
+    linear-gradient(to bottom, rgba(28,19,15,.60), rgba(28,19,15,.76)),
+    url('https://images.pexels.com/photos/35982640/pexels-photo-35982640.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat;
+}
+/* Grano/textura sutil sobre la foto, igual que el hero de inicio. */
+#cafes-hero::after{
+  content: "";
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(245,239,230,.10) 1px, transparent 1.4px);
+  background-size: 26px 26px;
+  opacity: .5;
+  pointer-events: none;
+}
+#cafes-hero > *{ position: relative; z-index: 1; }
+@media (max-width: 760px){ #cafes-hero{ padding: 108px 20px 74px; } }
+@media (max-width: 480px){ #cafes-hero{ padding: 96px 16px 62px; } }
+
+/* Barra de búsqueda de cafés: se superpone ligeramente al banner. */
+.ea-cafe-search{
+  max-width: 1240px;
+  margin: -34px auto 44px;
+  padding: 0 24px;
+  position: relative;
+  z-index: 2;
+}
+@media (max-width: 480px){ .ea-cafe-search{ margin-top: -24px; } }
