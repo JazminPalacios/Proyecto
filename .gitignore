@@ -1,7 +1,11 @@
 # Dependencias y builds del panel de administración
 admin/node_modules
 admin/dist
+admin/dist-tsbuild
 node_modules
+
+# Info incremental de tsc -b
+*.tsbuildinfo
 
 # Carpeta de salida que arma scripts/build.mjs (la publica Vercel)
 dist
