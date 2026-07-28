@@ -1,4 +1,5 @@
 {
+  "outputDirectory": "dist",
   "rewrites": [
     { "source": "/cafes", "destination": "/cafes.html" },
     { "source": "/equipos", "destination": "/equipos.html" },
