@@ -4,7 +4,7 @@ import { LoadingBlock } from '../components/ui/Spinner';
 import { ROUTES } from '../lib/constants';
 
 export function ProtectedRoute() {
-  const { session, loading } = useAuth();
+  const { session, isAdmin, loading } = useAuth();
 
   if (loading) {
     return (
@@ -14,7 +14,8 @@ export function ProtectedRoute() {
     );
   }
 
-  if (!session) {
+  // Sin sesión o sin ser administrador autorizado → al login.
+  if (!session || !isAdmin) {
     return <Navigate to={ROUTES.login} replace />;
   }
 

@@ -14,6 +14,11 @@
  *   - "home"  -> enlaces de navegación internos (#seccion) hacia la misma página.
  *   - "cafes" -> los enlaces de secciones apuntan a index.html#seccion.
  */
+// Config de Supabase para el sitio público (solo lectura).
+// La anon key es una clave PÚBLICA/publicable; RLS permite solo SELECT a anon.
+const EA_SUPABASE_URL = "https://vyxsdxklwfdgudrdpnaq.supabase.co";
+const EA_SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ5eHNkeGtsd2ZkZ3VkcmRwbmFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3Mzk1OTEsImV4cCI6MjEwMDMxNTU5MX0.Dd4HKPdFaKKRcs-KfS8m8HFG22PipsaF0JeQ4hW71aI";
+
 window.EA = {
   makeComponent(DCLogic, opts) {
     opts = opts || {};
@@ -23,7 +28,7 @@ window.EA = {
     const sec = (hash) => (PAGE === "home" ? hash : "index.html" + hash);
 
     return class Component extends DCLogic {
-      state = { theme: null, menuOpen: false, cartOpen: false, cart: [], query: "", cat: "all", coffeeQuery: "", coffeeTag: "all", featSlide: 0, featPerView: 4, openFaq: 0, cToast: false, nToast: false };
+      state = { theme: null, menuOpen: false, cartOpen: false, cart: [], query: "", cat: "all", coffeeQuery: "", coffeeTag: "all", featSlide: 0, featPerView: 4, openFaq: 0, cToast: false, nToast: false, dbCoffees: null, dbProducts: null };
 
       // Cantidad de equipos destacados en el carrusel de inicio (múltiplo de 4).
       get FEAT_COUNT(){ return Math.min(12, this.PRODUCTS.length); }
@@ -31,7 +36,12 @@ window.EA = {
 
       fmt(n){ return "₲ " + n.toLocaleString("es-PY"); }
 
-      get COFFEES(){ return [
+      // Catálogo efectivo: usa lo que venga de Supabase; si no hay datos
+      // (base vacía, sin red o error), cae al catálogo por defecto de abajo.
+      get COFFEES(){ return this.state.dbCoffees ?? this.DEFAULT_COFFEES; }
+      get PRODUCTS(){ return this.state.dbProducts ?? this.DEFAULT_PRODUCTS; }
+
+      get DEFAULT_COFFEES(){ return [
         { id:"espresso", name:"Espresso", tag:"Clásico", price:12000, slot:"cf-espresso", desc:"Shot intenso y aromático, corazón de todo buen café.", img:"https://images.pexels.com/photos/18604200/pexels-photo-18604200.jpeg?auto=compress&cs=tinysrgb&w=900" },
         { id:"americano", name:"Americano", tag:"Suave", price:15000, slot:"cf-americano", desc:"Espresso alargado con agua caliente, equilibrado y ligero.", img:"https://images.pexels.com/photos/12039010/pexels-photo-12039010.jpeg?auto=compress&cs=tinysrgb&w=900" },
         { id:"capuccino", name:"Capuccino", tag:"Cremoso", price:22000, slot:"cf-capuccino", desc:"Espresso, leche vaporizada y una nube de espuma sedosa.", img:"https://images.pexels.com/photos/997670/pexels-photo-997670.jpeg?auto=compress&cs=tinysrgb&w=900" },
@@ -46,7 +56,7 @@ window.EA = {
         { id:"especialidad", name:"Café de Especialidad", tag:"Premium", price:32000, slot:"cf-especialidad", desc:"Grano de origen único, tostado y servido con arte.", img:"https://images.pexels.com/photos/19873648/pexels-photo-19873648.jpeg?auto=compress&cs=tinysrgb&w=900" },
       ]; }
 
-      get PRODUCTS(){ return [
+      get DEFAULT_PRODUCTS(){ return [
         { id:"p-italiana", name:"Cafetera Italiana", cat:"cafeteras", price:180000, slot:"pr-italiana", desc:"Moka clásica para un espresso casero con carácter.", img:"https://images.pexels.com/photos/28613082/pexels-photo-28613082.jpeg?auto=compress&cs=tinysrgb&w=900" },
         { id:"p-francesa", name:"Cafetera Francesa", cat:"cafeteras", price:210000, slot:"pr-francesa", desc:"Prensa de émbolo para un cuerpo redondo y aromático.", img:"https://images.pexels.com/photos/34566502/pexels-photo-34566502.jpeg?auto=compress&cs=tinysrgb&w=900" },
         { id:"p-goteo", name:"Cafetera de Goteo", cat:"cafeteras", price:250000, slot:"pr-goteo", desc:"Preparación automática por goteo, ideal para la familia.", img:"https://images.pexels.com/photos/8937271/pexels-photo-8937271.jpeg?auto=compress&cs=tinysrgb&w=900" },
@@ -61,6 +71,39 @@ window.EA = {
         { id:"p-tamper", name:"Tamper", cat:"accesorios", price:120000, slot:"pr-tamper", desc:"Prensa el café con presión pareja y precisa.", img:"https://images.pexels.com/photos/4349794/pexels-photo-4349794.jpeg?auto=compress&cs=tinysrgb&w=900" },
         { id:"p-balanza", name:"Balanza para Café", cat:"accesorios", price:180000, slot:"pr-balanza", desc:"Precisión al gramo para recetas perfectas.", img:"https://images.pexels.com/photos/34492952/pexels-photo-34492952.jpeg?auto=compress&cs=tinysrgb&w=900" },
       ]; }
+
+      // Trae cafés y equipos desde Supabase (solo disponibles). Si algo falla
+      // o no hay filas, deja el estado en null y se usa el catálogo por defecto.
+      fetchCatalog(){
+        const base = EA_SUPABASE_URL + "/rest/v1/";
+        const headers = {
+          apikey: EA_SUPABASE_ANON,
+          Authorization: "Bearer " + EA_SUPABASE_ANON,
+          "Accept-Profile": "cafetero",
+        };
+        const cols = "select=id,nombre,descripcion,precio,imagen,disponible,categorias(nombre)";
+        const q = "&disponible=eq.true&order=created_at.asc";
+        const get = (t) => fetch(base + t + "?" + cols + q, { headers }).then(r => r.ok ? r.json() : null);
+
+        Promise.all([get("cafes"), get("equipos")]).then(([cafes, equipos]) => {
+          const catName = (r) => (r.categorias && r.categorias.nombre) || "";
+          const coffees = Array.isArray(cafes) ? cafes.map(r => ({
+            id: r.id, name: r.nombre, tag: catName(r) || "Otros",
+            price: Number(r.precio) || 0, slot: "cf-" + r.id,
+            desc: r.descripcion || "", img: r.imagen || "",
+          })) : [];
+          const products = Array.isArray(equipos) ? equipos.map(r => ({
+            id: r.id, name: r.nombre, cat: catName(r).toLowerCase(),
+            price: Number(r.precio) || 0, slot: "pr-" + r.id,
+            desc: r.descripcion || "", img: r.imagen || "",
+          })) : [];
+          // Solo reemplaza si hay datos; si no, se mantiene el catálogo por defecto.
+          this.setState({
+            dbCoffees: coffees.length ? coffees : null,
+            dbProducts: products.length ? products : null,
+          });
+        }).catch(() => { /* silencioso: se usa el catálogo por defecto */ });
+      }
 
       get theme(){ return this.state.theme ?? (this.props.themeDefault ?? "light"); }
       get waNumber(){ return (this.props.waNumber ?? "595971234567").replace(/\D/g,""); }
@@ -78,6 +121,7 @@ window.EA = {
       componentDidUpdate(){ this.applyTex(); }
       componentDidMount(){
         this.applyTex();
+        this.fetchCatalog();
         // scroll-triggered reveal
         const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const els = Array.from(document.querySelectorAll("[data-reveal]"));

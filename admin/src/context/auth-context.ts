@@ -4,6 +4,8 @@ import type { Session, User } from '@supabase/supabase-js';
 export interface AuthContextValue {
   session: Session | null;
   user: User | null;
+  /** true solo si el usuario está en cafetero.administradores y activo. */
+  isAdmin: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;

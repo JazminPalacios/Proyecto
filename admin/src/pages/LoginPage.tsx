@@ -12,7 +12,7 @@ import { getErrorMessage } from '../lib/format';
 import { ROUTES } from '../lib/constants';
 
 export function LoginPage() {
-  const { session, loading, signIn } = useAuth();
+  const { session, isAdmin, loading, signIn } = useAuth();
   const navigate = useNavigate();
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -25,10 +25,10 @@ export function LoginPage() {
     defaultValues: { email: '', password: '' },
   });
 
-  // Si ya hay sesión, al dashboard.
+  // Si ya hay sesión de un administrador autorizado, al dashboard.
   useEffect(() => {
-    if (!loading && session) navigate(ROUTES.dashboard, { replace: true });
-  }, [loading, session, navigate]);
+    if (!loading && session && isAdmin) navigate(ROUTES.dashboard, { replace: true });
+  }, [loading, session, isAdmin, navigate]);
 
   const onSubmit = async (values: LoginValues) => {
     setAuthError(null);
@@ -36,7 +36,9 @@ export function LoginPage() {
       await signIn(values.email, values.password);
       navigate(ROUTES.dashboard, { replace: true });
     } catch (e) {
-      setAuthError('Email o contraseña incorrectos. ' + getErrorMessage(e));
+      const msg = getErrorMessage(e);
+      // Distinguir "no autorizado" de credenciales inválidas.
+      setAuthError(/autoriz/i.test(msg) ? msg : 'Email o contraseña incorrectos. ' + msg);
     }
   };
 
